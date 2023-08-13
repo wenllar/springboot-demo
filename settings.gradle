@@ -1,0 +1,6 @@
+rootProject.name = 'sprintboot-demo'
+include 'springboot-navtive'
+include 'springboot-project'
+include 'springbooot-app'
+include 'springboot-test'
+

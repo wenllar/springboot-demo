@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+}
+
+group 'com.wenllar'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    // 首先从本地maven库获取资源
+    mavenLocal()
+    // 从私服获取资源
+    maven {
+        url 'http://localhost:8081/repository/maven-public/'
+        credentials(PasswordCredentials) {
+            username 'admin'
+            password 'admin123'
+        }
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//将src文件夹中的资源文件同时打包
+processResources {
+    from('src/main/java') {
+        include '**/*.xml'
+    }
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+// 定义源码包
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+// 定义javadoc
+task javadocJar(type: Jar){
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
