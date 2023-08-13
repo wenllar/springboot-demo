@@ -1,0 +1,109 @@
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group 'com.wenllar'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    // 首先从本地maven库获取资源
+    mavenLocal()
+    // 从私服获取资源
+    maven {
+        url 'http://localhost:8081/repository/maven-public/'
+        credentials(PasswordCredentials) {
+            username 'admin'
+            password 'admin123'
+        }
+    }
+}
+// 不需要引入的包写在此处
+configurations {
+    all*.exclude group: 'org.apache.tomcat.embed', module: 'tomcat-embed-core'
+    all*.exclude group: 'com.zaxxer', module: 'HikariCP'
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'javax.servlet', name: 'javax.servlet-api',version: '3.1.0'
+    // core
+    compile group: 'org.springframework',  name: 'spring-core', version: '5.2.24.RELEASE'
+    // beans
+    compile group: 'org.springframework',  name: 'spring-beans', version: '5.2.24.RELEASE'
+    // aop
+    compile group: 'org.springframework',  name: 'spring-aop', version: '5.2.24.RELEASE'
+    // context
+    compile group: 'org.springframework',  name: 'spring-context', version: '5.2.24.RELEASE'
+    // mvc
+    compile group: 'org.springframework',  name: 'spring-webmvc', version: '5.2.24.RELEASE'
+    // tomcat - 从springboot-native中继承
+   // compileOnly group: 'org.apache.tomcat.embed',  name: 'tomcat-embed-core', version: '9.0.78'
+    // Jetty
+     compile group: 'org.eclipse.jetty',  name: 'jetty-server', version: '9.4.50.v20221201'
+    // jetty-servlet
+     compile  group: 'org.eclipse.jetty',  name: 'jetty-servlet', version: '9.4.50.v20221201'
+
+    compile project(':springboot-navtive')
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+//将src文件夹中的资源文件同时打包
+processResources {
+    from('src/main/java') {
+        include '**/*.xml'
+    }
+}
+// 定义源码包
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    archiveClassifier = 'sources'
+}
+// 定义javadoc
+task javadocJar(type: Jar){
+    from javadoc
+    archiveClassifier = 'javadoc'
+}
+// 发布到本地目录
+publishing {
+    publications {
+        mavenJava(MavenPublication){
+            artifactId = project.name
+            from components.java
+            // artifact sourcesJar
+            // artifact javadocJar
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = project.name
+            }
+        }
+    }
+    repositories {
+        maven {
+            url 'http://localhost:8081/repository/maven-public/'
+            credentials(PasswordCredentials) {
+                username 'admin'
+                password 'admin123'
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}

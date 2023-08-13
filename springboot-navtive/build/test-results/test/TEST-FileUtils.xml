@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="FileUtils" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-08-13T05:24:52" hostname="XTZJ-20230715HP" time="0.002">
+  <properties/>
+  <testcase name="convertFileEncoding2UTF8" classname="FileUtils" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
